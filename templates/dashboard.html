@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title }}</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --primary: #1d4ed8;
+      --primary-soft: #e0eaff;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #dfe7f4;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #eef4ff 0%, #f9fafb 100%);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 20px;
+    }
+
+    .topbar {
+      background: var(--panel);
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 2rem;
+      letter-spacing: -0.03em;
+    }
+
+    .subheading {
+      color: var(--muted);
+      margin: 0;
+      font-size: 0.98rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1.9fr;
+      gap: 22px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 1.2rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    textarea, input[type="file"] {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      background: #fff;
+      margin-bottom: 16px;
+    }
+
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+    }
+
+    button {
+      border: none;
+      background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+      color: white;
+      padding: 12px 18px;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .status {
+      margin-top: 18px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .flash {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #ecfdf5;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+      font-weight: 600;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef4ff;
+      color: var(--text);
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .shortlist { background: #dcfce7; color: #166534; }
+    .review { background: #fef3c7; color: #92400e; }
+    .reject { background: #fee2e2; color: #991b1b; }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <h1>{{ title }}</h1>
+      <p class="subheading">Professional ATS screening for recruiter review, shortlist decisions, and candidate comparison.</p>
+    </div>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Screen candidates</h2>
+
+        <form method="post" enctype="multipart/form-data">
+          <div>
+            <label for="job_description">Job description</label>
+            <textarea id="job_description" name="job_description" placeholder="Paste the JD or role requirements here...">{{ request.form.get('job_description', '') }}</textarea>
+          </div>
+
+          <div>
+            <label for="resume_text">Single resume text</label>
+            <textarea id="resume_text" name="resume_text" placeholder="Paste a resume or candidate profile here..."></textarea>
+          </div>
+
+          <div>
+            <label for="csv_file">Upload CSV batch</label>
+            <input id="csv_file" type="file" name="csv_file" accept=".csv" />
+          </div>
+
+          <button type="submit">Run screening</button>
+        </form>
+
+        {% if status_message %}
+        <div class="status">{{ status_message }}</div>
+        {% endif %}
+
+        {% if flash_message %}
+        <div class="flash">{{ flash_message }}</div>
+        {% endif %}
+      </section>
+
+      <section class="panel">
+        <h2>Candidate results</h2>
+
+        {% if results %}
+        <div class="stats">
+          {% set shortlist = results | selectattr('decision', 'equalto', 'Shortlist') | list | length %}
+          {% set review = results | selectattr('decision', 'equalto', 'Review') | list | length %}
+          {% set reject = results | selectattr('decision', 'equalto', 'Reject') | list | length %}
+          {% set avg = (results | map(attribute='score') | sum) / results | length if results else 0 %}
+
+          <div class="stat">
+            <div class="stat-label">Total</div>
+            <div class="stat-value">{{ results | length }}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Average</div>
+            <div class="stat-value">{{ '%.2f' % avg }}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Shortlist</div>
+            <div class="stat-value">{{ shortlist }}</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Candidate</th>
+              <th>Score</th>
+              <th>Decision</th>
+              <th>Keywords</th>
+              <th>Missing</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in results %}
+            <tr>
+              <td>{{ item.candidate_name }}</td>
+              <td>{{ item.score }}</td>
+              <td>
+                {% set decision = item.decision %}
+                {% if decision == 'Shortlist' %}
+                  <span class="pill shortlist">Shortlist</span>
+                {% elif decision == 'Review' %}
+                  <span class="pill review">Review</span>
+                {% else %}
+                  <span class="pill reject">Reject</span>
+                {% endif %}
+              </td>
+              <td>{{ ', '.join(item.matched_keywords) if item.matched_keywords else 'None' }}</td>
+              <td>{{ ', '.join(item.missing_keywords) if item.missing_keywords else 'None' }}</td>
+              <td>{{ item.decision_reason if item.decision_reason else 'No additional notes.' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>No candidates have been screened yet. Add a JD and either paste a resume or upload a CSV file.</p>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+</body>
+</html>
