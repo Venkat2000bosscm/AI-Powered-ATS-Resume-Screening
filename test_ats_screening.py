@@ -1,4 +1,5 @@
 from ats_resume_screening import (
+    export_shortlist_csv,
     generate_dashboard_html,
     score_candidate,
     screen_candidates_from_csv,
@@ -28,6 +29,46 @@ def test_score_candidate_matches_required_keywords():
     assert result["decision"] in {"Shortlist", "Review"}
     assert "decision_reason" in result
     assert result["decision_reason"]
+
+
+def test_general_stop_words_are_excluded_from_keyword_match():
+    job_description = "Strong communication and leadership with SQL, Agile, and stakeholder management"
+    resume_text = "Strong communication and leadership with SQL, Agile, and stakeholder management"
+
+    result = score_candidate(job_description, resume_text)
+
+    assert "strong" not in result["matched_keywords"]
+    assert "sql" in result["matched_keywords"]
+    assert result["score"] >= 60
+
+
+def test_score_candidate_returns_category_breakdown():
+    job_description = "Senior Business Analyst with SQL, Agile, reporting, stakeholder management, requirements"
+    resume_text = "Business Analyst with SQL, Agile, reporting, stakeholder management, requirements gathering, 6 years experience"
+
+    result = score_candidate(job_description, resume_text)
+
+    assert "score_breakdown" in result
+    assert set(result["score_breakdown"]).issuperset({"keyword_match", "role_fit", "experience", "critical_skills"})
+    assert result["score_breakdown"]["keyword_match"] > 0
+    assert result["score_breakdown"]["role_fit"] > 0
+
+
+def test_export_shortlist_csv_writes_ranked_candidates(tmp_path):
+    export_path = tmp_path / "shortlist.csv"
+    results = [
+        {"candidate_name": "Alice", "score": 88, "decision": "Shortlist", "matched_keywords": ["SQL", "Agile"], "missing_keywords": []},
+        {"candidate_name": "Bob", "score": 72, "decision": "Review", "matched_keywords": ["SQL"], "missing_keywords": ["Stakeholder"]},
+    ]
+
+    exported = export_shortlist_csv(results, str(export_path))
+
+    assert exported == str(export_path)
+    assert export_path.exists()
+    content = export_path.read_text(encoding="utf-8")
+    assert "candidate_name" in content
+    assert "Alice" in content
+    assert "Bob" in content
 
 
 def test_summarize_result_provides_hr_ready_summary():

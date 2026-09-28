@@ -224,8 +224,13 @@
           </div>
 
           <div>
-            <label for="csv_file">Upload CSV batch</label>
-            <input id="csv_file" type="file" name="csv_file" accept=".csv" />
+            <label for="pdf_file">Upload PDF resume</label>
+            <input id="pdf_file" type="file" name="pdf_file" accept=".pdf" />
+          </div>
+
+          <div>
+            <label for="csv_file">Upload CSV or Excel batch</label>
+            <input id="csv_file" type="file" name="csv_file" accept=".csv,.xlsx,.xls,.xlsm" />
           </div>
 
           <button type="submit">Run screening</button>
@@ -237,6 +242,10 @@
 
         {% if flash_message %}
         <div class="flash">{{ flash_message }}</div>
+        {% endif %}
+
+        {% if export_path %}
+        <div class="flash"><a href="/{{ export_path.split('/')[-1] }}" download>Download shortlist CSV</a></div>
         {% endif %}
       </section>
 
@@ -267,17 +276,21 @@
         <table>
           <thead>
             <tr>
+              <th>Rank</th>
               <th>Candidate</th>
               <th>Score</th>
               <th>Decision</th>
               <th>Keywords</th>
               <th>Missing</th>
+              <th>Experience</th>
+              <th>Score Breakdown</th>
               <th>Reason</th>
             </tr>
           </thead>
           <tbody>
-            {% for item in results %}
+            {% for item in results|sort(attribute='score', reverse=True) %}
             <tr>
+              <td>{{ loop.index }}</td>
               <td>{{ item.candidate_name }}</td>
               <td>{{ item.score }}</td>
               <td>
@@ -292,13 +305,15 @@
               </td>
               <td>{{ ', '.join(item.matched_keywords) if item.matched_keywords else 'None' }}</td>
               <td>{{ ', '.join(item.missing_keywords) if item.missing_keywords else 'None' }}</td>
+              <td>{{ item.experience_years }}</td>
+              <td>{{ item.score_explanation if item.score_explanation else 'N/A' }}</td>
               <td>{{ item.decision_reason if item.decision_reason else 'No additional notes.' }}</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
         {% else %}
-        <p>No candidates have been screened yet. Add a JD and either paste a resume or upload a CSV file.</p>
+        <p>No candidates have been screened yet. Add a JD and either paste a resume, upload a PDF, or upload a CSV file.</p>
         {% endif %}
       </section>
     </div>
