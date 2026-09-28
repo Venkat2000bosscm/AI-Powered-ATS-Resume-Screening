@@ -12,6 +12,7 @@ Thumbs.db
 coverage/
 htmlcov/
 .pyc
-
-# Local generated outputs
+.copilot-azure/
+tmp_candidates.csv
 recruiter_dashboard.html
+
